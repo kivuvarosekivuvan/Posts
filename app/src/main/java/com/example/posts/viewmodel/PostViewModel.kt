@@ -1,31 +1,30 @@
 package com.example.posts.viewmodel
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.posts.repository.PostRepository
 import com.example.posts.model.Post
+import com.example.posts.repository.PostRepository
 import kotlinx.coroutines.launch
 
-
 class PostViewModel : ViewModel() {
-    val postsRepo=PostRepository()
-    val postLiveData= MutableLiveData<List<Post>>()
-    val errorLiveData= MutableLiveData<String>()
+    private val postRepository = PostRepository()
 
-    fun fetchProducts(){
+    val postLiveData = MutableLiveData<List<Post>>()
+    val errorLiveData = MutableLiveData<String>()
+
+    fun fetchPosts() {
         viewModelScope.launch {
-            val response = postsRepo.getPosts()
-            if(response.isInitialized){
-                postLiveData.postValue(response.body()?.posts)
-            }else{
-                errorLiveData.postValue(response.errorBody()?.string())
+            try {
+                val response = postRepository.getPosts()
+                if (response.isSuccessful) {
+                    postLiveData.postValue(response.body())
+                } else {
+                    errorLiveData.postValue(response.errorBody()?.string())
+                }
+            } catch (exception: Exception) {
+                errorLiveData.postValue(exception.message)
             }
         }
     }
-
-
 }
-
-
