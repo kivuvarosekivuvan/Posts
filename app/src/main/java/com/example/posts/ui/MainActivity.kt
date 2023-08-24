@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.posts.databinding.ActivityMainBinding
@@ -21,26 +22,34 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val recyclerView: RecyclerView = binding.recyclerView
-        val linearLayoutManager = LinearLayoutManager(this)
-        recyclerView.layoutManager = linearLayoutManager
 
+        val recyclerView: RecyclerView = binding.recyclerView
+        val gridLayoutManager = GridLayoutManager(this, 2)
+        recyclerView.layoutManager = gridLayoutManager
         postAdapter = PostAdapter(emptyList())
         recyclerView.adapter = postAdapter
 
-        postViewModel = ViewModelProvider(this).get(PostViewModel::class.java)
-        postViewModel.posts.observe(this, Observer { posts ->
-            postAdapter.setPosts(posts)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        postViewModel.fetchPosts()
+        postViewModel.postLiveData.observe(this, Observer { postList->
+            postAdapter.updatePosts(postList)
+
         })
 
-        postViewModel.error.observe(this, Observer { error ->
+        postViewModel.errorLiveData.observe(this, Observer { error->
             Toast.makeText(
                 baseContext,
                 error ?: "An error occurred",
                 Toast.LENGTH_LONG
             ).show()
+
         })
 
-        postViewModel.fetchPosts()
+
+
+
     }
 }

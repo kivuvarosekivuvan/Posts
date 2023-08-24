@@ -28,8 +28,8 @@ class PostAdapter(private var postList: List<Post>) : RecyclerView.Adapter<PostA
     inner class PostViewHolder(private val binding: PostListBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(post: Post) {
             binding.apply {
-                textViewTitle.text = post.title
-                textViewBody.text = post.body
+                tvTitle.text = post.title
+                tvBody.text = post.body
             }
         }
     }
